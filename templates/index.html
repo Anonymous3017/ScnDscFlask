@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scene Description API</title>
+    <style>
+        /* Add a dark gray background color to the page */
+        body {
+            background-color: #333333;
+        }
+
+        /* Center the form container on the page */
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Match the height of the viewport */
+            width: 100vw; /* Match the width of the viewport */
+        }
+
+        /* Style the form */
+        form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #cccccc;
+        }
+
+        /* Style the form inputs */
+        input[type='file'] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Style the submit button */
+        input[type='submit'] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Change the background color of the submit button on hover */
+        input[type='submit']:hover {
+            background-color: #45a049;
+        }
+
+        /* Style the labels */
+        label {
+            color: #cccccc;
+        }
+
+        /* Style the caption display and audio player */
+        #caption-container {
+            margin-top: 20px;
+        }
+
+        #caption {
+            color: #333;
+            font-size: 18px;
+        }
+
+        #audio-player {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
+            <label for="custom_img">Custom Image:</label>
+            <input type="file" id="custom_img" name="file">
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <div id="caption-container" style="text-align: center; background-color: white; color: black; padding: 10px; box-shadow: 0px 0px 10px #cccccc;">
+            <p id="caption" style="font-size: 20px; font-family: Arial, sans-serif;">Caption will be displayed here</p>
+            <audio id="audio-player" controls>
+                <source src="" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+    
+    <div style="text-align: center; background-color: white; color: black; padding: 10px; box-shadow: 0px 0px 10px #cccccc;">
+        <p style="font-size: 20px; font-family: Arial, sans-serif;">Copyright © 2023 f8th</p>
+        <p style="font-size: 14px; font-family: Arial, sans-serif;">Made with ❤ in INDIA</p>
+    </div>
+
+    <script>
+        // JavaScript to handle form submission and API response
+        const uploadForm = document.getElementById('upload-form');
+        const captionContainer = document.getElementById('caption-container');
+        const caption = document.getElementById('caption');
+        const audioPlayer = document.getElementById('audio-player');
+
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(uploadForm);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    caption.textContent = data.caption;
+                    audioPlayer.style.display = 'block';
+                    audioPlayer.src = data.audio_file;
+                } else {
+                    caption.textContent = 'Error processing the image.';
+                    audioPlayer.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('API request error:', error);
+                caption.textContent = 'Error processing the image.';
+                audioPlayer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
